@@ -3,9 +3,13 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common/pipes';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from './transform/transform.interceptor';
+import getLogLevels from './utils/getLogLevels';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+    logger: getLogLevels(process.env.NODE_ENV === 'production'),
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Web3logo API')

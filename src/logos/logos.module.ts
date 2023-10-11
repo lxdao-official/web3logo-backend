@@ -4,6 +4,6 @@ import { LogosController } from './logos.controller';
 
 @Module({
   controllers: [LogosController],
-  providers: [LogosService]
+  providers: [LogosService],
 })
 export class LogosModule {}
