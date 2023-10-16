@@ -10,26 +10,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id         Int          @id @default(autoincrement())
-  address    String
-  Logos      Logos[]
-  Favourites Favourites[]
+model LogoNames {
+  id       Int     @id @default(autoincrement())
+  logoName String  @unique
+  logoType String
+  website  String?
+  logos    Logos[]
 }
 
 model Logos {
-  id         Int          @id @default(autoincrement())
-  url        String
-  author     Users?       @relation(fields: [authorId], references: [id])
-  authorId   Int?
-  status     String
-  Favourites Favourites[]
+  id            Int          @id @default(autoincrement())
+  logoNames     LogoNames?   @relation(fields: [logoNameId], references: [id])
+  logoNameId    Int?
+  file          String       @unique
+  authorAddress String
+  status        String
+  downloadNum   Int?         @default(0)
+  favoritesNum  Int?         @default(0)
+  Favorites     Favorites[]
 }
 
-model Favourites {
-  id       Int    @id @default(autoincrement())
-  logo     Logos? @relation(fields: [logoId], references: [id])
-  logoId   Int?
-  author   Users? @relation(fields: [authorId], references: [id])
-  authorId Int?
+model Favorites {
+  id      Int    @id @default(autoincrement())
+  logos   Logos? @relation(fields: [logoId], references: [id])
+  logoId  Int?
+  address String
+  @@unique([logoId, address])
 }
