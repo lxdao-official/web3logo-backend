@@ -2,9 +2,7 @@ import { Injectable, StreamableFile } from '@nestjs/common';
 import { CreateLogoDto } from './dto/create-logo.dto';
 import { UpdateLogoDto } from './dto/update-logo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PageSize, FindLogos } from './dto/find-logo.dto';
-import { createReadStream } from 'fs';
-import { log } from 'console';
+import { PageSize } from './dto/find-logo.dto';
 
 @Injectable()
 export class LogosService {
@@ -21,10 +19,10 @@ export class LogosService {
         logoName,
         logoType,
         website,
-        logos: { create: saveFile },
+        logo: { create: saveFile },
       },
       include: {
-        logos: true,
+        logo: true,
       },
     });
     return result;
@@ -50,37 +48,41 @@ export class LogosService {
     return result;
   }
 
-  async saveFavorite(logoId: number, address: string) {
-    const saveFavorite = this.prismaService.favorites.create({
-      data: {
-        logoId,
-        address,
+  async cancelFavorite(id: number) {
+    await this.prismaService.favorites.delete({
+      where: {
+        id,
       },
     });
-    const addFavoriteNum = this.prismaService.logos.update({
-      where: { id: logoId },
-      data: {
-        favoritesNum: {
-          increment: 1,
-        },
-      },
-    });
-    const transaction = await this.prismaService.$transaction([
-      saveFavorite,
-      addFavoriteNum,
-    ]);
-
-    return transaction;
+    return 'success';
   }
 
   async findLogoById(logoId: number) {
     const logo = await this.prismaService.logos.findFirst({
       where: { id: logoId },
       include: {
-        logoNames: true,
+        logoName: true,
       },
     });
 
     return logo;
+  }
+
+  async findOwnLogos(address: string) {
+    return await this.prismaService.logos.findMany({
+      where: {
+        authorAddress: address,
+      },
+      include: {
+        logoName: true,
+      },
+    });
+  }
+
+  async downloadNumUpdate(id: number) {
+    await this.prismaService.logos.update({
+      where: { id },
+      data: { downloadNum: { increment: 1 } },
+    });
   }
 }

@@ -6,6 +6,7 @@ import { TestModule } from './test/test.module';
 import { PrismaService } from './prisma/prisma.service';
 import { LogosModule } from './logos/logos.module';
 import { UsersModule } from './users/users.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UsersModule } from './users/users.module';
     TestModule,
     LogosModule,
     UsersModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

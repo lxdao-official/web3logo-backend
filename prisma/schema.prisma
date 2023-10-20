@@ -15,12 +15,12 @@ model LogoNames {
   logoName String  @unique
   logoType String
   website  String?
-  logos    Logos[]
+  logo    Logos[]
 }
 
 model Logos {
   id            Int          @id @default(autoincrement())
-  logoNames     LogoNames?   @relation(fields: [logoNameId], references: [id])
+  logoName     LogoNames?   @relation(fields: [logoNameId], references: [id])
   logoNameId    Int?
   file          String       @unique
   authorAddress String
@@ -32,7 +32,7 @@ model Logos {
 
 model Favorites {
   id      Int    @id @default(autoincrement())
-  logos   Logos? @relation(fields: [logoId], references: [id])
+  logo   Logos? @relation(fields: [logoId], references: [id])
   logoId  Int?
   address String
   @@unique([logoId, address])
