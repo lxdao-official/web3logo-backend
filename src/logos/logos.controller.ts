@@ -19,7 +19,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { PageSize } from './dto/find-logo.dto';
+import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
 import axios from 'axios';
 
 @ApiTags('Logos')
@@ -38,7 +38,13 @@ export class LogosController {
   @Get('/findLogoName')
   @ApiQuery({ name: 'page', type: Number, description: 'page' })
   @ApiQuery({ name: 'size', type: Number, description: 'size' })
-  async findLogoName(@Query() query: PageSize) {
+  @ApiQuery({
+    name: 'key',
+    type: String,
+    description: 'keyword',
+    required: false,
+  })
+  async findLogoName(@Query() query: FindLogoNameQuery) {
     return await this.logosService.findLogoName(query);
   }
 

@@ -2,7 +2,8 @@ import { Injectable, StreamableFile } from '@nestjs/common';
 import { CreateLogoDto } from './dto/create-logo.dto';
 import { UpdateLogoDto } from './dto/update-logo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PageSize } from './dto/find-logo.dto';
+import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class LogosService {
@@ -28,13 +29,24 @@ export class LogosService {
     return result;
   }
 
-  async findLogoName(query: PageSize) {
-    const { page, size } = query;
+  async findLogoName(query: FindLogoNameQuery) {
+    const { page, size, key } = query;
     const skip = page * size;
-    const total = await this.prismaService.logoNames.count();
+    const where: Prisma.LogoNamesWhereInput = {};
+    if (key) {
+      where.logoName = {
+        contains: key,
+        mode: 'insensitive',
+      };
+    }
+    const total = await this.prismaService.logoNames.count({ where });
     const result = await this.prismaService.logoNames.findMany({
+      where,
       skip,
       take: +query.size,
+      include: {
+        logo: { where: { status: 'checked' } },
+      },
     });
     return { data: result, page, size, total };
   }
