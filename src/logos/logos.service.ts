@@ -1,9 +1,11 @@
+import { Favorite } from './../favorites/entities/favorite.entity';
 import { Injectable, StreamableFile } from '@nestjs/common';
 import { CreateLogoDto } from './dto/create-logo.dto';
 import { UpdateLogoDto } from './dto/update-logo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
 import { Prisma } from '@prisma/client';
+import { log } from 'console';
 
 @Injectable()
 export class LogosService {
@@ -45,10 +47,40 @@ export class LogosService {
       skip,
       take: +query.size,
       include: {
-        logo: { where: { status: 'checked' } },
+        logo: {
+          where: { status: 'checked' },
+        },
       },
     });
+
     return { data: result, page, size, total };
+  }
+
+  async findLogoNameById(id: number, address: string) {
+    const result = await this.prismaService.logoNames.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        logo: true,
+      },
+    });
+    if (address) {
+      const userFavorite = await this.prismaService.favorites.findMany({
+        where: { address },
+      });
+      const userFavoriteLogoId = userFavorite.map((logo) => logo.logoId);
+      result.logo = result.logo.map((logo) => {
+        const isFavorite = userFavoriteLogoId.includes(logo.id);
+        const favoriteId = userFavorite.find((i) => i.logoId === logo.id)?.id;
+        return {
+          ...logo,
+          favoriteId,
+          isFavorite,
+        };
+      });
+    }
+    return result;
   }
 
   async findLogoByLogoNameId(logoNameId: number) {

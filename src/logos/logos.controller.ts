@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
 import axios from 'axios';
+import { Response } from 'express';
 
 @ApiTags('Logos')
 @Controller('logos')
@@ -48,6 +49,21 @@ export class LogosController {
     return await this.logosService.findLogoName(query);
   }
 
+  @Get('/findLogoName/:id')
+  @ApiParam({ name: 'id', type: 'number', description: 'id' })
+  @ApiQuery({
+    name: 'address',
+    type: String,
+    description: 'address',
+    required: false,
+  })
+  async findLogoNameById(
+    @Param('id') id: number,
+    @Query('address') address: string,
+  ) {
+    return await this.logosService.findLogoNameById(+id, address);
+  }
+
   @Get('/findLogos/:logoNameId')
   @ApiParam({ name: 'logoNameId', type: 'number', description: 'logoNameId' })
   async findLogos(@Param('logoNameId') logoNameId: number) {
@@ -56,7 +72,7 @@ export class LogosController {
 
   @Get('/downloadLogo/:logoId')
   @ApiParam({ name: 'logoId', description: 'logoId' })
-  async downloadLogo(@Param('logoId') logoId: number, @Res() res) {
+  async downloadLogo(@Param('logoId') logoId: number, @Res() res: Response) {
     const logo = await this.logosService.findLogoById(+logoId);
     const response = await axios.get(logo.file, { responseType: 'stream' });
     const contentType = response.headers['content-type'];
@@ -64,7 +80,7 @@ export class LogosController {
     res.setHeader('Content-Type', contentType);
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="${logo.logoName.logoName}.${imgType}"`,
+      `attachment;filename=${logo.logoName.logoName}.${imgType}`,
     );
     response.data.pipe(res);
     await this.logosService.downloadNumUpdate(+logoId);
