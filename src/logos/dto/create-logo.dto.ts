@@ -1,6 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
+export class FileObject {
+  @IsNotEmpty()
+  @ApiProperty({ required: true, type: 'string', default: '' })
+  file: string;
+
+  @IsNotEmpty()
+  @ApiProperty({ required: true, type: 'string', default: '' })
+  fileName: string;
+
+  @IsNotEmpty()
+  @ApiProperty({ required: true, type: 'string', default: '' })
+  fileType: string;
+}
+
+export class OnlyUploadFile extends FileObject {
+  @IsNotEmpty()
+  @ApiProperty({ required: true, type: 'string', default: '' })
+  logoNameId: number;
+  @IsNotEmpty()
+  @ApiProperty({ required: true, type: 'string', default: '' })
+  authorAddress: string;
+}
+
 export class CreateLogoDto {
   @ApiProperty({ required: true, type: 'string', default: 'Ethernum' })
   @IsString()
@@ -21,15 +44,12 @@ export class CreateLogoDto {
 
   @ApiProperty({
     required: true,
-    type: 'string[]',
-    default: [
-      'https:/nftstorage.link/ipfs/bafkreiauxrwcagu2w3knv2l5t4ax45vom7t3ibsfqtgy7sima3aoucqzva',
-      'https:/nftstorage.link/ipfs/bafkreiauxrwcagu2w3knv2l5t4ax45vom7t3ibsfqtgy7sima3aoucqzv2',
-    ],
+    type: [FileObject],
+    default: [{ file: '', fileName: '', fileType: '' }],
   })
   @IsArray()
   @IsNotEmpty()
-  files: string[];
+  files: FileObject[];
 
   @ApiProperty({
     required: true,

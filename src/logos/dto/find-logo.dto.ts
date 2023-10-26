@@ -5,4 +5,4 @@ export interface PageSize {
 
 export type FindLogos = PageSize & { logoNameId: number };
 
-export type FindLogoNameQuery = PageSize & { key?: string };
+export type FindLogoNameQuery = PageSize & { key?: string; logoType?: string };

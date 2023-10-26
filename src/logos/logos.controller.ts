@@ -11,7 +11,11 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import { LogosService } from './logos.service';
-import { CreateLogoDto } from './dto/create-logo.dto';
+import {
+  CreateLogoDto,
+  FileObject,
+  OnlyUploadFile,
+} from './dto/create-logo.dto';
 import {
   ApiBody,
   ApiOperation,
@@ -36,11 +40,27 @@ export class LogosController {
     return await this.logosService.create(createLogoDto);
   }
 
+  @Post('/onlyUploadFile')
+  @ApiOperation({
+    summary: 'only upload Logos',
+    description: 'only upload Logos',
+  })
+  @ApiBody({ type: OnlyUploadFile })
+  async onlyUploadFile(@Body() createLogoDto: OnlyUploadFile) {
+    return await this.logosService.onlyUploadFile(createLogoDto);
+  }
+
   @Get('/findLogoName')
   @ApiQuery({ name: 'page', type: Number, description: 'page' })
   @ApiQuery({ name: 'size', type: Number, description: 'size' })
   @ApiQuery({
     name: 'key',
+    type: String,
+    description: 'keyword',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'logoType',
     type: String,
     description: 'keyword',
     required: false,

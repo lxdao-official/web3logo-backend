@@ -11,29 +11,33 @@ datasource db {
 }
 
 model LogoNames {
-  id       Int     @id @default(autoincrement())
-  logoName String  @unique
-  logoType String
-  website  String?
-  logo    Logos[]
+  id               Int     @id @default(autoincrement())
+  logoName         String  @unique
+  logoType         String
+  website          String?
+  logo             Logos[]
+  downloadTotalNum Int     @default(0)
 }
 
 model Logos {
-  id            Int          @id @default(autoincrement())
-  logoName     LogoNames?   @relation(fields: [logoNameId], references: [id])
+  id            Int         @id @default(autoincrement())
+  logoName      LogoNames?  @relation(fields: [logoNameId], references: [id])
   logoNameId    Int?
-  file          String       @unique
+  file          String      @unique
+  fileName      String?
+  fileType      String?
   authorAddress String
   status        String
-  downloadNum   Int?         @default(0)
-  favoritesNum  Int?         @default(0)
+  downloadNum   Int?        @default(0)
+  favoritesNum  Int?        @default(0)
   Favorites     Favorites[]
 }
 
 model Favorites {
   id      Int    @id @default(autoincrement())
-  logo   Logos? @relation(fields: [logoId], references: [id])
+  logo    Logos? @relation(fields: [logoId], references: [id])
   logoId  Int?
   address String
+
   @@unique([logoId, address])
 }

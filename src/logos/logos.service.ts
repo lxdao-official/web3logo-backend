@@ -1,6 +1,10 @@
 import { Favorite } from './../favorites/entities/favorite.entity';
 import { Injectable, StreamableFile } from '@nestjs/common';
-import { CreateLogoDto } from './dto/create-logo.dto';
+import {
+  CreateLogoDto,
+  FileObject,
+  OnlyUploadFile,
+} from './dto/create-logo.dto';
 import { UpdateLogoDto } from './dto/update-logo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
@@ -13,7 +17,7 @@ export class LogosService {
   async create(createLogoDto: CreateLogoDto) {
     const { files, logoName, logoType, website, authorAddress } = createLogoDto;
     const saveFile = files.map((file) => ({
-      file,
+      ...file,
       status: 'checking',
       authorAddress,
     }));
@@ -22,6 +26,7 @@ export class LogosService {
         logoName,
         logoType,
         website,
+        downloadTotalNum: 0,
         logo: { create: saveFile },
       },
       include: {
@@ -31,8 +36,15 @@ export class LogosService {
     return result;
   }
 
+  async onlyUploadFile(createLogoDto: OnlyUploadFile) {
+    const result = await this.prismaService.logos.create({
+      data: { ...createLogoDto, status: 'checking' },
+    });
+    return result;
+  }
+
   async findLogoName(query: FindLogoNameQuery) {
-    const { page, size, key } = query;
+    const { page, size, key, logoType } = query;
     const skip = page * size;
     const where: Prisma.LogoNamesWhereInput = {};
     if (key) {
@@ -41,6 +53,9 @@ export class LogosService {
         mode: 'insensitive',
       };
     }
+    if (logoType) {
+      where.logoName = logoType;
+    }
     const total = await this.prismaService.logoNames.count({ where });
     const result = await this.prismaService.logoNames.findMany({
       where,
@@ -48,12 +63,17 @@ export class LogosService {
       take: +query.size,
       include: {
         logo: {
-          where: { status: 'checked' },
+          where: { status: 'active' },
         },
       },
     });
 
-    return { data: result, page, size, total };
+    return {
+      data: result.filter((item) => item.logo.length > 0),
+      page,
+      size,
+      total,
+    };
   }
 
   async findLogoNameById(id: number, address: string) {
@@ -62,7 +82,12 @@ export class LogosService {
         id,
       },
       include: {
-        logo: true,
+        logo: {
+          orderBy: {
+            id: 'asc',
+          },
+          where: { status: 'active' },
+        },
       },
     });
     if (address) {
@@ -124,9 +149,19 @@ export class LogosService {
   }
 
   async downloadNumUpdate(id: number) {
-    await this.prismaService.logos.update({
+    const info = await this.prismaService.logos.findFirst({
       where: { id },
-      data: { downloadNum: { increment: 1 } },
+      include: { logoName: true },
     });
+    this.prismaService.$transaction([
+      this.prismaService.logos.update({
+        where: { id },
+        data: { downloadNum: { increment: 1 } },
+      }),
+      this.prismaService.logoNames.update({
+        where: { id: info.logoNameId },
+        data: { downloadTotalNum: { increment: 1 } },
+      }),
+    ]);
   }
 }
