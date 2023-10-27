@@ -40,6 +40,17 @@ export class LogosController {
     return await this.logosService.create(createLogoDto);
   }
 
+  @Get('/getLogoByAddress')
+  @ApiQuery({ name: 'address', type: String, description: 'address' })
+  @ApiQuery({
+    name: 'type',
+    type: String,
+    description: 'type:  upload | favorite | checking',
+  })
+  async getLogoByAddress(@Query() query: { address: string; type: string }) {
+    return await this.logosService.getLogoByAddress(query);
+  }
+
   @Post('/onlyUploadFile')
   @ApiOperation({
     summary: 'only upload Logos',

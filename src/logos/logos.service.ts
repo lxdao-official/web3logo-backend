@@ -164,4 +164,38 @@ export class LogosService {
       }),
     ]);
   }
+
+  async getLogoByAddress(query: { address: string; type: string }) {
+    let result = [];
+    switch (query.type) {
+      case 'upload':
+        result = await this.prismaService.logos.findMany({
+          where: {
+            authorAddress: query.address,
+          },
+        });
+        break;
+      case 'favorite':
+        result = await this.prismaService.favorites.findMany({
+          where: {
+            address: query.address,
+          },
+          include: {
+            logo: true,
+          },
+        });
+        break;
+      case 'checking':
+        result = await this.prismaService.logos.findMany({
+          where: {
+            status: 'checking',
+          },
+          include: {
+            logoName: true,
+          },
+        });
+        break;
+    }
+    return result || [];
+  }
 }
