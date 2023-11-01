@@ -5,7 +5,7 @@ import {
   FileObject,
   OnlyUploadFile,
 } from './dto/create-logo.dto';
-import { UpdateLogoDto } from './dto/update-logo.dto';
+import { CheckLogoDto, UpdateLogoDto } from './dto/update-logo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
 import { Prisma } from '@prisma/client';
@@ -197,5 +197,19 @@ export class LogosService {
         break;
     }
     return result || [];
+  }
+
+  async checkLogo(logoIdList: CheckLogoDto[]) {
+    const updateTask = logoIdList.map((item) =>
+      this.prismaService.logos.update({
+        where: {
+          id: item.id,
+        },
+        data: {
+          status: item.isAgree ? 'active' : 'checking',
+        },
+      }),
+    );
+    return await this.prismaService.$transaction(updateTask);
   }
 }

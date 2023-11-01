@@ -26,6 +26,7 @@ import {
 import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
 import axios from 'axios';
 import { Response } from 'express';
+import { CheckLogoDto } from './dto/update-logo.dto';
 
 @ApiTags('Logos')
 @Controller('logos')
@@ -121,5 +122,15 @@ export class LogosController {
   @ApiParam({ name: 'address', description: 'address' })
   async findOwnLogos(@Param('address') address: string) {
     return await this.logosService.findOwnLogos(address);
+  }
+
+  @Post('/checkLogo')
+  @ApiBody({
+    type: CheckLogoDto,
+    isArray: true,
+    description: 'logo id',
+  })
+  async checkLogo(@Body() info: CheckLogoDto[]) {
+    return await this.logosService.checkLogo(info);
   }
 }
