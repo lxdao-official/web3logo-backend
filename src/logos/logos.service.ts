@@ -43,6 +43,47 @@ export class LogosService {
     return result;
   }
 
+  async batchUploadFile(createLogoDto: CreateLogoDto[]) {
+    const task = createLogoDto.map(async (i) => {
+      const { files, logoName, logoType, website, authorAddress } = i;
+      const saveFile = files.map((file) => ({
+        ...file,
+        status: 'checking',
+        authorAddress,
+      }));
+      const findLogoName = await this.prismaService.logoNames.findFirst({
+        where: {
+          logoName,
+          logoType,
+        },
+      });
+      if (findLogoName) {
+        return this.prismaService.logos.createMany({
+          data: files.map((file) => ({
+            ...file,
+            logoNameId: findLogoName.id,
+            status: 'checking',
+            authorAddress,
+          })),
+        });
+      } else {
+        return this.prismaService.logoNames.create({
+          data: {
+            logoName,
+            logoType,
+            website,
+            downloadTotalNum: 0,
+            logo: { create: saveFile },
+          },
+          include: {
+            logo: true,
+          },
+        });
+      }
+    });
+    await Promise.all(task);
+  }
+
   async findLogoName(query: FindLogoNameQuery) {
     const { page, size, key, logoType } = query;
     const skip = page * size;
@@ -200,6 +241,7 @@ export class LogosService {
   }
 
   async checkLogo(logoIdList: CheckLogoDto[]) {
+    console.log('checkLogo', logoIdList);
     const updateTask = logoIdList.map((item) =>
       this.prismaService.logos.update({
         where: {

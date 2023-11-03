@@ -62,6 +62,16 @@ export class LogosController {
     return await this.logosService.onlyUploadFile(createLogoDto);
   }
 
+  @Post('/batchUploadFile')
+  @ApiOperation({
+    summary: 'batch upload Logos',
+    description: 'batch upload Logos',
+  })
+  @ApiBody({ type: CreateLogoDto, isArray: true })
+  async batchUploadFile(@Body() createLogoDto: CreateLogoDto[]) {
+    return await this.logosService.batchUploadFile(createLogoDto);
+  }
+
   @Get('/findLogoName')
   @ApiQuery({ name: 'page', type: Number, description: 'page' })
   @ApiQuery({ name: 'size', type: Number, description: 'size' })
