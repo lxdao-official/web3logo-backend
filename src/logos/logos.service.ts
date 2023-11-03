@@ -95,7 +95,7 @@ export class LogosService {
       };
     }
     if (logoType) {
-      where.logoName = logoType;
+      where.logoType = logoType;
     }
     const total = await this.prismaService.logoNames.count({ where });
     const result = await this.prismaService.logoNames.findMany({
