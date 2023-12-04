@@ -241,14 +241,13 @@ export class LogosService {
   }
 
   async checkLogo(logoIdList: CheckLogoDto[]) {
-    console.log('checkLogo', logoIdList);
     const updateTask = logoIdList.map((item) =>
       this.prismaService.logos.update({
         where: {
           id: item.id,
         },
         data: {
-          status: item.isAgree ? 'active' : 'checking',
+          status: item.isAgree == true ? 'active' : 'reject',
         },
       }),
     );
