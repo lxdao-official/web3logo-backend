@@ -21,19 +21,38 @@ export class LogosService {
       status: 'checking',
       authorAddress,
     }));
-    const result = await this.prismaService.logoNames.create({
-      data: {
-        logoName,
-        logoType,
-        website,
-        downloadTotalNum: 0,
-        logo: { create: saveFile },
-      },
-      include: {
-        logo: true,
-      },
+
+    const ishad = await this.prismaService.logoNames.findUnique({
+      where: { logoName },
     });
-    return result;
+    if (ishad) {
+      const result = await this.prismaService.logoNames.update({
+        where: { logoName },
+        data: {
+          logo: { create: saveFile },
+        },
+        include: {
+          logo: true,
+        },
+      });
+      return result;
+    } else {
+      const result = await this.prismaService.logoNames.create({
+        data: {
+          logoName,
+          logoType,
+          website,
+          downloadTotalNum: 0,
+          logo: { create: saveFile },
+        },
+        include: {
+          logo: true,
+        },
+      });
+      return result;
+    }
+
+   
   }
 
   async onlyUploadFile(createLogoDto: OnlyUploadFile) {
