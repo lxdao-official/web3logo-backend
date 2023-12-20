@@ -105,6 +105,9 @@ export class LogosService {
       include: {
         logo: {
           where: { status: 'active' },
+          orderBy: {
+            id: 'asc',
+          },
         },
       },
     });
