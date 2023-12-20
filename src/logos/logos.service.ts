@@ -51,8 +51,6 @@ export class LogosService {
       });
       return result;
     }
-
-   
   }
 
   async onlyUploadFile(createLogoDto: OnlyUploadFile) {
