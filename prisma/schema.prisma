@@ -13,7 +13,7 @@ datasource db {
 model LogoNames {
   id               Int     @id @default(autoincrement())
   logoName         String  @unique
-  logoType         String
+  logoType         String?
   website          String?
   logo             Logos[]
   downloadTotalNum Int     @default(0)
@@ -23,7 +23,7 @@ model Logos {
   id            Int         @id @default(autoincrement())
   logoName      LogoNames?  @relation(fields: [logoNameId], references: [id])
   logoNameId    Int?
-  file          String      @unique
+  file          String      
   fileName      String?
   fileType      String?
   authorAddress String
