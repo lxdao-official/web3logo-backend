@@ -17,4 +17,13 @@ export class CheckLogoDto {
     required: true,
   })
   isAgree: boolean;
+
+  @IsNotEmpty()
+  @ApiProperty({
+    name: 'logoType',
+    type: String,
+    example: 'NFTs',
+    required: true,
+  })
+  logoType: string;
 }

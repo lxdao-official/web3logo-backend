@@ -143,4 +143,9 @@ export class LogosController {
   async checkLogo(@Body() info: CheckLogoDto[]) {
     return await this.logosService.checkLogo(info);
   }
+
+  @Post('/uploadImgByCode')
+  async uploadImgByCode(@Body() paths: any[]) {
+    return await this.logosService.uploadImgByCode(paths);
+  }
 }

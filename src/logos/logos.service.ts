@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
 import { Prisma } from '@prisma/client';
 import { log } from 'console';
+import batchUpload from 'src/utils/batchUpload';
 
 @Injectable()
 export class LogosService {
@@ -251,6 +252,10 @@ export class LogosService {
           where: {
             status: 'checking',
           },
+          take: 10,
+          orderBy: {
+            id: 'asc',
+          },
           include: {
             logoName: true,
           },
@@ -268,9 +273,39 @@ export class LogosService {
         },
         data: {
           status: item.isAgree == true ? 'active' : 'reject',
+          logoName: {
+            update: {
+              logoType: item.logoType,
+            },
+          },
+        },
+        include: {
+          logoName: true,
         },
       }),
     );
     return await this.prismaService.$transaction(updateTask);
+  }
+
+  async uploadImgByCode(path: any[]) {
+    const imgUrl = await batchUpload(path);
+    console.log(imgUrl);
+    const info = imgUrl.map(
+      (i) =>
+        ({
+          logoName: i.name,
+          logoType: '',
+          website: '',
+          files: [
+            {
+              fileName: i.name,
+              fileType: i.type,
+              file: i.url,
+            },
+          ],
+          authorAddress: '0x257c21206df8a751dE09B3502B32d25888099DB9',
+        } as unknown as CreateLogoDto),
+    );
+    await this.batchUploadFile(info);
   }
 }
