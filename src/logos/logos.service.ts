@@ -10,7 +10,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
 import { Prisma } from '@prisma/client';
 import { log } from 'console';
-import batchUpload from 'src/utils/batchUpload';
 
 @Injectable()
 export class LogosService {
@@ -287,9 +286,7 @@ export class LogosService {
     return await this.prismaService.$transaction(updateTask);
   }
 
-  async uploadImgByCode(path: any[]) {
-    const imgUrl = await batchUpload(path);
-    console.log(imgUrl);
+  async uploadImgByCode(imgUrl: any[]) {
     const info = imgUrl.map(
       (i) =>
         ({

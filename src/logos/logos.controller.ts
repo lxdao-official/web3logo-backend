@@ -145,7 +145,7 @@ export class LogosController {
   }
 
   @Post('/uploadImgByCode')
-  async uploadImgByCode(@Body() paths: any[]) {
-    return await this.logosService.uploadImgByCode(paths);
+  async uploadImgByCode(@Body() imgUrl: any[]) {
+    return await this.logosService.uploadImgByCode(imgUrl);
   }
 }
