@@ -71,7 +71,6 @@ export class LogosService {
       const findLogoName = await this.prismaService.logoNames.findFirst({
         where: {
           logoName,
-          logoType,
         },
       });
       if (findLogoName) {
