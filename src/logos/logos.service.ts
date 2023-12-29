@@ -252,7 +252,7 @@ export class LogosService {
           },
           take: 10,
           orderBy: {
-            id: 'asc',
+            id: 'desc',
           },
           include: {
             logoName: true,
