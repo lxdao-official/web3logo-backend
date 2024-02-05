@@ -304,4 +304,20 @@ export class LogosService {
     );
     await this.batchUploadFile(info);
   }
+
+  async findAllLogs() {
+    return this.prismaService.logos.findMany();
+  }
+  async batchUpdateFile(dtos: { id: number; file: string }[]) {
+    const transaction = dtos.map((dto) => {
+      const updatedAt = new Date().toISOString();
+      return this.prismaService.logos.update({
+        where: { id: dto.id },
+        data: {
+          file: dto.file,
+        },
+      });
+    });
+    await this.prismaService.$transaction(transaction);
+  }
 }

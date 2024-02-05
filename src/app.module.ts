@@ -7,6 +7,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { LogosModule } from './logos/logos.module';
 import { UsersModule } from './users/users.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { UploadImgModule } from './upload-img/upload-img.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FavoritesModule } from './favorites/favorites.module';
     LogosModule,
     UsersModule,
     FavoritesModule,
+    UploadImgModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
