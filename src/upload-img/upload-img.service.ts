@@ -40,17 +40,16 @@ export class UploadImgService {
     }
   }
 
-  async updateAvatar() {
-    const builders = await this.logosService.findAllLogs();
-    const newImgs = builders
-      .filter((b) => !!b.file)
-      .map((b) => ({
-        id: b.id,
-        file: b.file.replace(
-          'https://d18wlguog0kde4.cloudfront.net',
-          'https://cdn.lxdao.io',
-        ),
-      }));
+  async updateErrorFiles() {
+    const logos = await this.logosService.findAllLogs();
+    const newImgs = logos
+      .filter((b) => b.file.length > 84 && !b.file.includes('nftstorage.link'))
+      .map((b) => {
+        return {
+          id: b.id,
+          file: `${b.file.slice(0, 81)}svg`,
+        };
+      });
     await this.logosService.batchUpdateFile(newImgs);
     return { data: newImgs };
   }
@@ -72,7 +71,9 @@ export class UploadImgService {
           return false;
         }
         const contentType = response.headers['content-type'];
-        const type = contentType.split('/').pop();
+        const type = contentType.includes('svg')
+          ? 'svg'
+          : contentType.split('/').pop();
 
         const imgName = `${cid}.${type}`;
         fs.writeFileSync(`imgs/${imgName}`, await download(url));
@@ -88,15 +89,15 @@ export class UploadImgService {
         console.log(b.id);
       }
     });
-    const newBuidlersImg = (await Promise.all(newImgPromise)).filter(
+    const newImgs = (await Promise.all(newImgPromise)).filter(
       (i) => i && i.id,
     ) as unknown as {
       id: number;
       file: string;
     }[];
-    await this.logosService.batchUpdateFile(newBuidlersImg);
+    await this.logosService.batchUpdateFile(newImgs);
     console.log('end');
-    return { data: newBuidlersImg };
+    return { data: newImgs };
   }
 
   getIpfsCid(ipfsUrl) {

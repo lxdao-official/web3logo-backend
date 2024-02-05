@@ -306,7 +306,7 @@ export class LogosService {
   }
 
   async findAllLogs() {
-    return this.prismaService.logos.findMany();
+    return this.prismaService.logos.findMany({ orderBy: { id: 'asc' } });
   }
   async batchUpdateFile(dtos: { id: number; file: string }[]) {
     const transaction = dtos.map((dto) => {
