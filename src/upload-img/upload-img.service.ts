@@ -14,16 +14,16 @@ export class UploadImgService {
   });
   constructor(private logosService: LogosService) {}
   async uploadFile(files: Array<Express.Multer.File>): Promise<any[]> {
-    console.log(process.env);
     try {
       const uploadFiles = files.map(async (file) => {
+        console.log('file', file);
         const type = file.originalname.split('.').pop();
         const name = `${uuidv4()}.${type}`;
         const params = {
           Bucket: 'lxdao-img-bucket',
           Key: name,
           Body: file.buffer,
-          ContentType: `image/${type}`,
+          ContentType: file.mimetype,
         };
 
         const result = await this.s3.upload(params).promise();
