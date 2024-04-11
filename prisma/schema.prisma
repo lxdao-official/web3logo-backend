@@ -31,6 +31,8 @@ model Logos {
   downloadNum   Int?        @default(0)
   favoritesNum  Int?        @default(0)
   Favorites     Favorites[]
+  createTime     DateTime?   @default(now()) 
+  updateTime     DateTime?   @updatedAt
 }
 
 model Favorites {

@@ -148,4 +148,9 @@ export class LogosController {
   async uploadImgByCode(@Body() imgUrl: any[]) {
     return await this.logosService.uploadImgByCode(imgUrl);
   }
+
+  @Post('/findLogoToExcel')
+  async findLogoToExcel() {
+    return await this.logosService.findLogoToExcel();
+  }
 }

@@ -11,6 +11,8 @@ import { FindLogoNameQuery, PageSize } from './dto/find-logo.dto';
 import { Prisma } from '@prisma/client';
 import { log } from 'console';
 
+import * as ExcelJS from 'exceljs';
+
 @Injectable()
 export class LogosService {
   constructor(private prismaService: PrismaService) {}
@@ -250,7 +252,7 @@ export class LogosService {
           where: {
             status: 'checking',
           },
-          take: 10,
+          // take: 20,
           orderBy: {
             id: 'desc',
           },
@@ -319,5 +321,57 @@ export class LogosService {
       });
     });
     await this.prismaService.$transaction(transaction);
+  }
+
+  async findLogoToExcel() {
+    const data = await this.prismaService.logos.findMany({
+      where: {
+        id: {
+          gt: 948,
+        },
+      },
+      orderBy: {
+        id: 'asc',
+      },
+      include: {
+        logoName: true,
+      },
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sheet 1');
+    worksheet.addRow([
+      'logo name',
+      'logo project',
+      'file name',
+      'file link',
+      'Address',
+      'file type',
+      'status',
+    ]);
+    data
+      .filter((i) => i.fileName.length < 20)
+      .forEach((b) => {
+        worksheet.addRow([
+          b.logoName.logoName,
+          b.logoName.logoType,
+          b.fileName,
+          b.file,
+          b.authorAddress,
+          b.fileType,
+          b.status,
+        ]);
+      });
+    const excelFilePath = 'example.xlsx';
+    workbook.xlsx
+      .writeFile(excelFilePath)
+      .then(() => {
+        console.log(`Excel file "${excelFilePath}" has been created.`);
+      })
+      .catch((error) => {
+        console.error('Error creating Excel file:', error);
+      });
+
+    return data;
   }
 }
