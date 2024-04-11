@@ -325,11 +325,11 @@ export class LogosService {
 
   async findLogoToExcel() {
     const data = await this.prismaService.logos.findMany({
-      where: {
-        id: {
-          gt: 948,
-        },
-      },
+      // where: {
+      //   id: {
+      //     gt: 948,
+      //   },
+      // },
       orderBy: {
         id: 'asc',
       },
@@ -350,11 +350,11 @@ export class LogosService {
       'status',
     ]);
     data
-      .filter((i) => i.fileName.length < 20)
+      // .filter((i) => i.fileName.length < 20)
       .forEach((b) => {
         worksheet.addRow([
-          b.logoName.logoName,
-          b.logoName.logoType,
+          b.logoName?.logoName,
+          b.logoName?.logoType,
           b.fileName,
           b.file,
           b.authorAddress,
